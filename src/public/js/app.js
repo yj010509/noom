@@ -309,7 +309,7 @@ socket.on("accept_join", async (userObjArr) => {
     return;
   }
 
-  writeChat("Notice!", NOTICE_CN);
+  writeChat("공지!", NOTICE_CN);
   for (let i = 0; i < length - 1; ++i) {
     try {
       const newPC = createConnection(
@@ -324,7 +324,7 @@ socket.on("accept_join", async (userObjArr) => {
       console.error(err);
     }
   }
-  writeChat("is in the room.", NOTICE_CN);
+  writeChat("님이 입장하셨습니다.", NOTICE_CN);
 });
 
 socket.on("offer", async (offer, remoteSocketId, remoteNickname) => {
@@ -334,7 +334,7 @@ socket.on("offer", async (offer, remoteSocketId, remoteNickname) => {
     const answer = await newPC.createAnswer();
     await newPC.setLocalDescription(answer);
     socket.emit("answer", answer, remoteSocketId);
-    writeChat(`notice! __${remoteNickname}__ joined the room`, NOTICE_CN);
+    writeChat(`notice! ${remoteNickname} joined the room`, NOTICE_CN);
   } catch (err) {
     console.error(err);
   }
@@ -429,3 +429,4 @@ function sortStreams() {
   const streamArr = streams.querySelectorAll("div");
   streamArr.forEach((stream) => (stream.className = `people${peopleInRoom}`));
 }
+
