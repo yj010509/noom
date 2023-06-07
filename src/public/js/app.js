@@ -349,7 +349,7 @@ socket.on("chat", (message) => {
 
 socket.on("leave_room", (leavedSocketId, nickname) => {
   removeVideo(leavedSocketId);
-  writeChat(`notice! ${nickname} 님이 방을 떠나셨습니다.`, NOTICE_CN);
+  writeChat(`공지! ${nickname} 님이 방을 떠나셨습니다.`, NOTICE_CN);
   --peopleInRoom;
   sortStreams();
 });
