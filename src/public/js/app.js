@@ -71,11 +71,6 @@ async function getMedia(deviceId) {
     myFace.muted = true;
 
     if (!deviceId) {
-      // mute default
-      myStream 
-        .getAudioTracks()
-        .forEach((track) => (track.enabled = false));
-
       await getCameras();
     }
   } catch (error) {
@@ -429,4 +424,3 @@ function sortStreams() {
   const streamArr = streams.querySelectorAll("div");
   streamArr.forEach((stream) => (stream.className = `people${peopleInRoom}`));
 }
-
