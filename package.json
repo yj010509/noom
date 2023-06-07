@@ -8,7 +8,8 @@
     "start": "node build/server.js",
     "build": "babel src -d build --ignore src/public",
     "dev": "nodemon",
-    "vercel": "vercel dev"
+    "vercel": "vercel dev",
+    "deploy": "vercel deploy"
   },
   "devDependencies": {
     "@babel/cli": "^7.21.5",
