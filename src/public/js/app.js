@@ -15,13 +15,15 @@ const welcome = document.querySelector("#welcome");
 const HIDDEN_CN = "hidden";
 
 let myStream;
-let muted = true;
+let muted = false;
 unMuteIcon.classList.add(HIDDEN_CN);
 let cameraOff = false;
 unCameraIcon.classList.add(HIDDEN_CN);
 let roomName = "";
 let nickname = "";
 let peopleInRoom = 1;
+let myPeerConnection;
+let peerStream
 
 let pcObj = {
   // remoteSocketId: pc
@@ -31,7 +33,8 @@ async function getCameras() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const cameras = devices.filter((device) => device.kind === "videoinput");
-    const currentCamera = myStream.getVideoTracks();
+
+    const currentCamera = myStream.getVideoTracks()[0];
     cameras.forEach((camera) => {
       const option = document.createElement("option");
       option.value = camera.deviceId;
@@ -69,7 +72,7 @@ async function getMedia(deviceId) {
 
     if (!deviceId) {
       // mute default
-      myStream //
+      myStream 
         .getAudioTracks()
         .forEach((track) => (track.enabled = false));
 
@@ -113,15 +116,12 @@ function handleCameraClick() {
 async function handleCameraChange() {
   try {
     await getMedia(camerasSelect.value);
-    if (peerConnectionObjArr.length > 0) {
-      const newVideoTrack = myStream.getVideoTracks()[0];
-      peerConnectionObjArr.forEach((peerConnectionObj) => {
-        const peerConnection = peerConnectionObj.connection;
-        const peerVideoSender = peerConnection
-          .getSenders()
-          .find((sender) => sender.track.kind == "video");
-        peerVideoSender.replaceTrack(newVideoTrack);
-      });
+    if (myPeerConnection) {
+      const videoTrack = myStream.getVideoTracks()[0];
+      const videoSender = myPeerConnection
+        .getSenders()
+        .find((sender) => sender.track.kind === "video");
+      videoSender.replaceTrack(videoTrack);
     }
   } catch (error) {
     console.log(error);
@@ -319,7 +319,7 @@ socket.on("accept_join", async (userObjArr) => {
       const offer = await newPC.createOffer();
       await newPC.setLocalDescription(offer);
       socket.emit("offer", offer, userObjArr[i].socketId, nickname);
-      writeChat(`__${userObjArr[i].nickname}__`, NOTICE_CN);
+      writeChat(`${userObjArr[i].nickname}`, NOTICE_CN);
     } catch (err) {
       console.error(err);
     }
@@ -334,7 +334,7 @@ socket.on("offer", async (offer, remoteSocketId, remoteNickname) => {
     const answer = await newPC.createAnswer();
     await newPC.setLocalDescription(answer);
     socket.emit("answer", answer, remoteSocketId);
-    writeChat(`notice! ${remoteNickname} joined the room`, NOTICE_CN);
+    writeChat(`공지! ${remoteNickname} 님이 입장하셨습니다.`, NOTICE_CN);
   } catch (err) {
     console.error(err);
   }
@@ -354,7 +354,7 @@ socket.on("chat", (message) => {
 
 socket.on("leave_room", (leavedSocketId, nickname) => {
   removeVideo(leavedSocketId);
-  writeChat(`notice! ${nickname} leaved the room.`, NOTICE_CN);
+  writeChat(`notice! ${nickname} 님이 방을 떠나셨습니다.`, NOTICE_CN);
   --peopleInRoom;
   sortStreams();
 });
